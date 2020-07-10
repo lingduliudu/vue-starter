@@ -1,21 +1,28 @@
 <template>
-	<div>
-		<el-button @click="executeData">开始处理</el-button>
+	<div class="templateClass">
+		<el-input placeholder="数据库" v-model="schemaName" style="width: 200px;margin-right: 5px;">
+			<template slot="prepend">数据库:</template>
+		</el-input>
+		<el-input placeholder="表名"  v-model="tableName" style="width: 240px;margin-right: 10px;">
+			<template slot="prepend">表:</template>
+		</el-input>
+		<el-button @click="executeData" type="primary">开始处理</el-button>
 		<el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
 			<el-table-column type="selection" width="55">
 			</el-table-column>
-			<el-table-column label="日期" width="120">
-				<template slot-scope="scope">{{ scope.row.date }}</template>
+			<el-table-column prop="tag" label="标识" width="120">
 			</el-table-column>
-			<el-table-column prop="name" label="姓名" width="120">
+			<el-table-column prop="name" label="文件名" width="120">
 			</el-table-column>
-			<el-table-column prop="address" label="地址" show-overflow-tooltip>
+			<el-table-column prop="desc" label="说明" show-overflow-tooltip>
+			</el-table-column>
+			<el-table-column prop="outPath" label="输出位置" show-overflow-tooltip>
+			</el-table-column>
+			<el-table-column prop="fileName" label="文件名规范" show-overflow-tooltip>
+			</el-table-column>
+			<el-table-column prop="overWrite" label="是否覆盖" show-overflow-tooltip>
 			</el-table-column>
 		</el-table>
-		<div style="margin-top: 20px">
-			<el-button @click="toggleSelection([tableData[1], tableData[2]])">切换第二、第三行的选中状态</el-button>
-			<el-button @click="toggleSelection()">取消选择</el-button>
-		</div>
 	</div>
 </template>
 
@@ -23,34 +30,48 @@
 	export default {
 		data() {
 			return {
+				schemaName: 'cgrzzl-factory',
+				tableName: 'p_cost',
 				tableData: [{
-					date: '2016-05-03',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1518 弄'
+					tag: 'Entity',
+					name: 'Entity.java.vm',
+					desc: '实体类',
+					outPath:'D:/test/',
+					fileName:'.java',
+					overWrite:"是",
+					overWriteFlag:1
 				}, {
-					date: '2016-05-02',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1518 弄'
+					tag: 'IMapper',
+					name: 'IMapper.java.vm',
+					desc: 'Dao接口层',
+					outPath:'D:/test/',
+					fileName:'IMapper.java',
+					overWrite:"是",
+					overWriteFlag:1
 				}, {
-					date: '2016-05-04',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1518 弄'
+					tag: 'IService',
+					name: 'IService.java.vm',
+					desc: 'Service接口层',
+					outPath:'D:/test/',
+					fileName:'IService.java',
+					overWrite:"是",
+					overWriteFlag:1
 				}, {
-					date: '2016-05-01',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1518 弄'
+					tag: 'Service',
+					name: 'Service.java.vm',
+					desc: 'Service实现层',
+					outPath:'D:/test/',
+					fileName:'Service.java',
+					overWrite:"是",
+					overWriteFlag:1
 				}, {
-					date: '2016-05-08',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1518 弄'
-				}, {
-					date: '2016-05-06',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1518 弄'
-				}, {
-					date: '2016-05-07',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1518 弄'
+					tag: 'Controller',
+					name: 'Controller.java.vm',
+					desc: 'Controller实现层',
+					outPath:'D:/test/',
+					fileName:'Controller.java',
+					overWrite:"是",
+					overWriteFlag:1
 				}],
 				multipleSelection: []
 			}
@@ -69,10 +90,34 @@
 			handleSelectionChange(val) {
 				this.multipleSelection = val;
 			},
-			executeData(){
+			async executeData() {
 				const selectData = this.$refs.multipleTable.selection
-				console.log(selectData[0].address)
+				if(selectData.length==0) {
+					this.$message({message: '至少一条',type: 'success',duration:1000})
+					return;
+				}
+				for(var i=0;i<selectData.length;i++){
+					let item = selectData[i]
+					item.schemaName = this.schemaName
+					item.tableName  = this.tableName
+					const result = await this.$http.post("generator",item)
+					this.$message({message: result.data.msg,type: 'success',duration:1000})
+				}
+				
+				//const selectData = this.$refs.multipleTable.selection
 			}
 		}
 	}
 </script>
+<style scoped>
+	.templateClass {
+		text-align: left;
+		align-items: flex-start;
+
+	}
+
+	.innerInput {
+		width: 40px;
+		height: 80px;
+	}
+</style>
