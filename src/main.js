@@ -7,7 +7,8 @@ import 'element-ui/lib/theme-chalk/index.css'
 
 Vue.use(ElementUI)
 Vue.use(VueRouter)
-Vue.use(axios)
+Vue.prototype.axios = axios
+//Vue.use(axios)
 axios.defaults.baseURL="http://localhost:6033/";
 Vue.config.productionTip = false
 Vue.prototype.$message =ElementUI.Message;

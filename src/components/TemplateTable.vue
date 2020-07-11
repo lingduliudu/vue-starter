@@ -7,7 +7,7 @@
 			<template slot="prepend">表:</template>
 		</el-input>
 		<el-button @click="executeData" type="primary">开始处理</el-button>
-		<el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+		<el-table v-loading="loading" ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
 			<el-table-column type="selection" width="55">
 			</el-table-column>
 			<el-table-column prop="tag" label="标识" width="120">
@@ -73,6 +73,7 @@
 					overWrite:"是",
 					overWriteFlag:1
 				}],
+				loading: false,
 				multipleSelection: []
 			}
 		},
@@ -100,7 +101,9 @@
 					let item = selectData[i]
 					item.schemaName = this.schemaName
 					item.tableName  = this.tableName
+					this.loading=!this.loading;
 					const result = await this.$http.post("generator",item)
+					this.loading=!this.loading;
 					this.$message({message: result.data.msg,type: 'success',duration:1000})
 				}
 				
@@ -109,7 +112,7 @@
 		}
 	}
 </script>
-<style scoped>
+<style lang="less" scoped>
 	.templateClass {
 		text-align: left;
 		align-items: flex-start;
